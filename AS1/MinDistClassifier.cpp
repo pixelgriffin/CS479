@@ -15,7 +15,7 @@ float MinDistClassifier::CalculateDiscriminant(Vector2f point, Vector2f m, Matri
 {
 	//Min dist function
 	Vector2f v = point - m;
-	float (v.transpose() * v) * -1.0;
+	return (v.transpose() * v) * -1.0;
 }
 
 void MinDistClassifier::ClassifyP3()
