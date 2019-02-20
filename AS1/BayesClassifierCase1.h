@@ -2,15 +2,17 @@
 
 #include "DataGenerator.h"
 #include "Classifier.h"
-#include "BayesClassifierCase3.h"
 
-class MinDistClassifier : public Classifier
+class BayesClassifierCase1 : public Classifier
 {
 public:
-	MinDistClassifier(BayesClassifierCase3* bc);
-	~MinDistClassifier();
+	BayesClassifierCase1();
+	~BayesClassifierCase1();
 
-	void ClassifyP3();
+	void ClassifyP1();
+
+	DataGenerator* GetDataGenerator1();
+	DataGenerator* GetDataGenerator2();
 
 protected:
 	float CalculateDiscriminant(Vector2f point, Vector2f m, Matrix2f sig, float prob);

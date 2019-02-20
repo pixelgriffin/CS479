@@ -13,8 +13,8 @@ void BoxMullerGenerator::GenerateNewData(int count, Vector2f m, Matrix2f sig)
 	for (int i = 0; i < count; i++)
 	{
 		this->data.push_back(
-			Vector2f(BoxMuller(m(0, 0), sig(0, 0)),
-				BoxMuller(m(1, 0), sig(1, 1)))
+			Vector2f(BoxMuller(m(0, 0), sqrt(sig(0, 0))),
+				BoxMuller(m(1, 0), sqrt(sig(1, 1))))
 		);
 	}
 }

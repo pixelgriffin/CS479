@@ -1,10 +1,10 @@
 #include "MinDistClassifier.h"
 #include "BoxMullerGenerator.h"
 
-MinDistClassifier::MinDistClassifier(BayesClassifier* bc)
+MinDistClassifier::MinDistClassifier(BayesClassifierCase3* bc)
 {
-	this->data1 = bc->getDataGenerator1();
-	this->data2 = bc->getDataGenerator2();
+	this->data1 = bc->GetDataGenerator1();
+	this->data2 = bc->GetDataGenerator2();
 }
 
 MinDistClassifier::~MinDistClassifier()
@@ -15,7 +15,8 @@ float MinDistClassifier::CalculateDiscriminant(Vector2f point, Vector2f m, Matri
 {
 	//Min dist function
 	Vector2f v = point - m;
-	return (v.transpose() * v) * -1.0;
+	float val = (v.transpose() * v);
+	return val * -1;
 }
 
 void MinDistClassifier::ClassifyP3()
