@@ -59,5 +59,8 @@ void MinDistClassifier::ClassifyP3()
 	this->misses1.clear();
 	this->misses2.clear();
 
+	//Save the bounds
+	this->SaveErrorBounds("errorBounds3.csv", m1, sig1, m2, sig2);
+
 	//No need to save test sample data here since it's just using P2's samples
 }

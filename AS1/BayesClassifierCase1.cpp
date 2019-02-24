@@ -101,6 +101,9 @@ void BayesClassifierCase1::ClassifyP1()
 	//Save the test data
 	this->data1->SaveDataToFile("data1_1.csv");
 	this->data2->SaveDataToFile("data1_2.csv");
+
+	//Save the bounds
+	this->SaveErrorBounds("errorBounds1.csv", m1, sig, m2, sig);
 }
 
 DataGenerator* BayesClassifierCase1::GetDataGenerator1()

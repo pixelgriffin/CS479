@@ -100,6 +100,9 @@ void BayesClassifierCase3::ClassifyP2()
 	//Save the test data
 	this->data1->SaveDataToFile("data2_1.csv");
 	this->data2->SaveDataToFile("data2_2.csv");
+
+	//Save the bounds
+	this->SaveErrorBounds("errorBounds2.csv", m1, sig1, m2, sig2);
 }
 
 DataGenerator* BayesClassifierCase3::GetDataGenerator1()
