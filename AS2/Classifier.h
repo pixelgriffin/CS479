@@ -7,6 +7,32 @@ class Classifier
 protected:
 	virtual float CalculateDiscriminant(Vector2f point, Vector2f m, Matrix2f sig, float prob) = 0;
 
+	Vector2f EstimateSampleMean(std::vector<Vector2f> points)
+	{
+		Vector2f sum(0, 0);
+
+		for (std::vector<Vector2f>::iterator it = points.begin(); it != points.end(); ++it)
+		{
+			sum += (*it);
+		}
+
+		return sum / points.size();
+	}
+
+	Matrix2f EstimateSampleCovariance(std::vector<Vector2f> points, Vector2f sampleMean)
+	{
+		Matrix2f sum;
+		sum << 0, 0,
+			   0, 0;
+
+		for (std::vector<Vector2f>::iterator it = points.begin(); it != points.end(); ++it)
+		{
+			sum += (sampleMean - (*it)) * (sampleMean - (*it)).transpose();
+		}
+
+		return sum / points.size();
+	}
+
 	void SaveMissclassifications(const char* fname)
 	{
 		if (!this->misses1.empty() || !this->misses2.empty())
