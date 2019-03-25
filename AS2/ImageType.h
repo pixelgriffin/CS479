@@ -11,7 +11,9 @@ public:
 	ImageType(int n, int m, int q);
 	~ImageType();
 
-	void GetImageInfo(int& rows, int& cols, int& qs);
+	int GetN();
+	int GetM();
+	int GetQ();
 	void SetImageInfo(int rows, int cols, int qs);
 	void SetPixelVal(int i, int j, Vector3i val);
 	Vector3i GetPixelVal(int i, int j);

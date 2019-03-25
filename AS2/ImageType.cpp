@@ -42,18 +42,26 @@ ImageType::~ImageType()
 {
 }
 
-void ImageType::GetImageInfo(int& rows, int& cols, int& qs)
+int ImageType::GetN()
 {
-	rows = this->n;
-	cols = this->m;
-	qs = this->q;
+	return this->n;
+}
+
+int ImageType::GetM()
+{
+	return this->m;
+}
+
+int ImageType::GetQ()
+{
+	return this->q;
 }
 
 void ImageType::SetImageInfo(int rows, int cols, int qs)
 {
-	n = rows;
-	m = cols;
-	q = qs;
+	this->n = rows;
+	this->m = cols;
+	this->q = qs;
 }
 
 void ImageType::SetPixelVal(int i, int j, Vector3i val)
@@ -124,7 +132,9 @@ void ImageType::ReadImage(const char* fname)
 	}
 	pixelValue = NULL;
 
+	cout << "applying image info: " << N << ", " << M << ", " << Q << endl;
 	SetImageInfo(N, M, Q);
+	cout << "image info: " << this->n << ", " << this->m << ", " << this->q << endl;
 
 	//Initialize image matrix with 0s
 	pixelValue = new Vector3i*[n];
@@ -161,7 +171,9 @@ void ImageType::WriteImage(const char* fname)
 	unsigned char *charImage;
 	ofstream ofp;
 
-	GetImageInfo(N, M, Q);
+	N = GetN();
+	M = GetM();
+	Q = GetQ();
 
 	charImage = (unsigned char *) new unsigned char[3 * M*N];
 
