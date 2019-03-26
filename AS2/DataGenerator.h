@@ -31,6 +31,39 @@ public:
 		}
 	}
 
+	void ReadDataFromFile(const char* fname)
+	{
+		   this->data.clear();
+
+		   std::vector<std::vector<float>> M;
+
+		   std::ifstream f(fname);
+		   std::string line;
+		   getline(f, line);
+		   while (getline(f, line))
+		   {
+			  std::stringstream ss(line);
+			  std::vector<float> row;
+			  std::string values;
+		      while (getline(ss, values, ','))
+		      {
+		         row.vector::push_back(stof(values));
+		      }
+		      if (row.size() > 0) M.vector::push_back(row);
+		   }
+
+		   std::cout << M.size() <<std::endl;
+
+		   for (unsigned int i = 0; i < M.size(); i++)
+		   	{
+
+			   this->data.push_back(
+		   			Vector2f(M[i][0],M[i][1])
+			   );
+
+		   	}
+	}
+	
 public:
 	std::vector<Vector2f> data;
 };
