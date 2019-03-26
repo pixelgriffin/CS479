@@ -37,7 +37,36 @@ void BayesClassifierCase3::ClassifyP2()
 
 	Vector2f m1(1, 1);
 	Vector2f m2(4, 4);
+	
+	/*
+	// parameters for assignment2 problem1
+	Vector2f m1(0.998582, 1.00151);
+	Vector2f m2(3.99429, 3.99695);
 
+	Matrix2f sig1;
+	sig1 << 1.00643, -0.00239859,
+			-0.00239859, 1.00596;
+	Matrix2f sig2;
+	sig2 << 0.996028, 0.00524115,
+			0.00524115, 0.994026;
+	
+
+	// parameters for assignment2 problem2
+		Vector2f m1(0.997173, 1.00321);
+		Vector2f m2(4.00088, 3.99697);
+
+		Matrix2f sig1;
+		sig1 << 1.00117, -0.000106357,
+				-0.000106357, 0.99675;
+		Matrix2f sig2;
+		sig2 << 3.99783, 0.00549449,
+				0.00549449, 7.97935;
+
+	// insert generated data from previous assignment
+	this->data1->ReadDataFromFile("question2_sample1.csv");
+	this->data2->ReadDataFromFile("question2_sample2.csv");
+	*/
+	
 	//Number of data points in each set
 	int pointCount = 100000;
 
