@@ -1,14 +1,17 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
-#include "BayesClassifierCase1.h"
 #include "BayesClassifierCase3.h"
-#include "MinDistClassifier.h"
-#include "PGMImage.h"
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
+	BayesClassifierCase3 bc3;
+	bc3.ClassifyP2();
+
+	getchar();
 
 	return 0;
 }

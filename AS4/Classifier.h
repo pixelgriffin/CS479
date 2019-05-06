@@ -1,17 +1,58 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 class Classifier
 {
 protected:
-	virtual float CalculateDiscriminant(Vector2f point, Vector2f m, Matrix2f sig, float prob) = 0;
+	virtual float CalculateDiscriminant(VectorXf point, VectorXf m, MatrixXf sig, float prob) = 0;
 
-	Vector2f EstimateSampleMean(std::vector<Vector2f> points)
+	void ReadEigenFaceData(std::vector<VectorXf>& male, std::vector<VectorXf>& female, std::string fname, std::string targetname)
 	{
-		Vector2f sum(0, 0);
+		std::ifstream faces(fname);
+		std::ifstream target(targetname);
 
-		for (std::vector<Vector2f>::iterator it = points.begin(); it != points.end(); ++it)
+		std::string ln;
+		getline(target, ln);
+
+		std::istringstream tstream(ln);
+
+		while (getline(faces, ln))
+		{
+			std::istringstream iss(ln);
+
+			std::vector<float> vals;
+
+			float val;
+			while (iss >> val)
+			{
+				vals.push_back(val);
+			}
+
+			VectorXf f(vals.size());
+
+			for (int i = 0; i < vals.size(); i++)
+			{
+				f.row(i) << vals[i];
+			}
+
+			int classification = 0;
+			tstream >> classification;
+
+			if (classification == 1)
+				male.push_back(f);
+			else
+				female.push_back(f);
+		}
+	}
+
+	VectorXf EstimateSampleMean(std::vector<VectorXf> points)
+	{
+		VectorXf sum = VectorXf::Zero(points[0].rows());
+
+		for (std::vector<VectorXf>::iterator it = points.begin(); it != points.end(); ++it)
 		{
 			sum += (*it);
 		}
@@ -19,45 +60,16 @@ protected:
 		return sum / points.size();
 	}
 
-	Matrix2f EstimateSampleCovariance(std::vector<Vector2f> points, Vector2f sampleMean)
+	MatrixXf EstimateSampleCovariance(std::vector<VectorXf> points, VectorXf sampleMean)
 	{
-		Matrix2f sum;
-		sum << 0, 0,
-			   0, 0;
+		MatrixXf sum = MatrixXf::Zero(points[0].rows(), points[0].rows());
 
-		for (std::vector<Vector2f>::iterator it = points.begin(); it != points.end(); ++it)
+		for (std::vector<VectorXf>::iterator it = points.begin(); it != points.end(); ++it)
 		{
-			sum += (sampleMean - (*it)) * (sampleMean - (*it)).transpose();
+			sum += (sampleMean - (*it)) * ((sampleMean - (*it)).transpose());
 		}
 
 		return sum / points.size();
-	}
-
-	void SaveMissclassifications(const char* fname)
-	{
-		if (!this->misses1.empty() || !this->misses2.empty())
-		{
-			std::ofstream f(fname);
-
-			if (f.is_open())
-			{
-				f << "x,y,MISS-SAMPLE1" << std::endl;
-
-				for (std::vector<Vector2f>::iterator it = this->misses1.begin(); it != this->misses1.end(); ++it)
-				{
-					f << (*it)(0, 0) << "," << (*it)(1, 0) << std::endl;
-				}
-
-				f << "x,y,MISS-SAMPLE2" << std::endl;
-
-				for (std::vector<Vector2f>::iterator it = this->misses2.begin(); it != this->misses2.end(); ++it)
-				{
-					f << (*it)(0, 0) << "," << (*it)(1, 0) << std::endl;
-				}
-
-				f.close();
-			}
-		}
 	}
 
 	void SaveErrorBounds(const char* fname, Vector2f m1, Matrix2f sig1, Vector2f m2, Matrix2f sig2)
@@ -120,5 +132,5 @@ protected:
 	}
 
 protected:
-	std::vector<Vector2f> misses1, misses2;
+	std::vector<VectorXf> misses1, misses2;
 };

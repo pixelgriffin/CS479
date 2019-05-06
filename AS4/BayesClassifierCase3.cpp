@@ -1,3 +1,6 @@
+#include <iostream>
+#include <math.h>
+
 #include "BayesClassifierCase3.h"
 #include "BoxMullerGenerator.h"
 
@@ -19,90 +22,92 @@ BayesClassifierCase3::~BayesClassifierCase3()
 	}
 }
 
-float BayesClassifierCase3::CalculateDiscriminant(Vector2f point, Vector2f m, Matrix2f sig, float prob)
+float BayesClassifierCase3::CalculateDiscriminant(VectorXf point, VectorXf m, MatrixXf sig, float prob)
 {
 	//Bayes discriminant function case 3
-	return (point.transpose() * (-0.5 * sig.inverse()) * point) + ((sig.inverse() * m).transpose() * point)(0) + (-0.5 * m.transpose() * sig.inverse() * m) + (-0.5 * log(sig.determinant())) + (prob == 0.5 ? 0 : log(prob));
+	return (point.transpose() * (-0.5 * sig.inverse()) * point) +
+		((sig.inverse() * m).transpose() * point)(0) +
+		(-0.5 * m.transpose() * sig.inverse() * m);
+		//(-0.5 * log(sig.determinant()));
 }
 
 //Part two
 void BayesClassifierCase3::ClassifyP2()
 {
-	Matrix2f sig1;
-	sig1 << 1, 0,
-		0, 1;
-	Matrix2f sig2;
-	sig2 << 4, 0,
-		0, 8;
-
-	Vector2f m1(1, 1);
-	Vector2f m2(4, 4);
-
-	//Number of data points in each set
-	int pointCount = 100000;
-
-	//Generate two sets of data
-	this->data1->GenerateNewData(pointCount, m1, sig1);
-	this->data2->GenerateNewData(pointCount, m2, sig2);
-
-	//Here we do P(w1)=P(w2)=0.5 -----------------------------------------------------------
-	for (int i = 0; i < pointCount; i++)
+	for (int i = 1; i < 4; i++)
 	{
-		float d1 = CalculateDiscriminant(this->data1->data[i], m1, sig1, 0.5);
-		float d2 = CalculateDiscriminant(this->data1->data[i], m2, sig2, 0.5);
+		std::vector<VectorXf> maleFaces;
+		std::vector<VectorXf> femaleFaces;
 
-		if (d1 < d2)
+		std::string infname("genderdata/16_20/new-trPCA_0");
+		infname = infname + std::to_string(i);
+		infname = infname + ".txt";
+
+		std::string tgfname("genderdata/16_20/TtrPCA_0");
+		tgfname = tgfname + std::to_string(i);
+		tgfname = tgfname + ".txt";
+
+		ReadEigenFaceData(maleFaces, femaleFaces, infname, tgfname);
+
+		std::cout << "mf size: " << maleFaces.size() << std::endl;
+		std::cout << "ff size: " << femaleFaces.size() << std::endl;
+
+		VectorXf mm = EstimateSampleMean(maleFaces);
+		MatrixXf mc = EstimateSampleCovariance(maleFaces, mm);
+
+		VectorXf fm = EstimateSampleMean(femaleFaces);
+		MatrixXf fc = EstimateSampleCovariance(femaleFaces, fm);
+
+		int maleCorrect = 0;
+		int femaleCorrect = 0;
+
+		//Here we do P(w1)=P(w2)=0.5 -----------------------------------------------------------
+		std::cout << "classifying male faces" << std::endl;
+
+		for (int i = 0; i < maleFaces.size(); i++)
 		{
-			//We consider this data point a part of the data2 set, and it is therefore misclassified
-			this->misses1.push_back(this->data1->data[i]);
+			float d1 = CalculateDiscriminant(maleFaces[i], mm, mc, 0.5);
+			float d2 = CalculateDiscriminant(maleFaces[i], fm, fc, 0.5);
+
+			//std::cout << "face: " << maleFaces[i] << std::endl;
+			//std::cout << "d1: " << d1 << std::endl;
+			//std::cout << "d2: " << d2 << std::endl;
+
+			if (d1 >= d2)
+			{
+				maleCorrect++;
+			}
 		}
 
-		d1 = CalculateDiscriminant(this->data2->data[i], m1, sig1, 0.5);
-		d2 = CalculateDiscriminant(this->data2->data[i], m2, sig2, 0.5);
+		std::cout << "classifying female faces" << std::endl;
 
-		if (d1 > d2)
+		for (int i = 0; i < femaleFaces.size(); i++)
 		{
-			//We consider this data point a part of the data1 set, and it is therefore misclassified
-			this->misses2.push_back(this->data2->data[i]);
+			float d1 = CalculateDiscriminant(femaleFaces[i], fm, fc, 0.5);
+			float d2 = CalculateDiscriminant(femaleFaces[i], mm, mc, 0.5);
+
+			if (d1 >= d2)
+			{
+				femaleCorrect++;
+			}
+		}
+
+		std::cout << "male correct: " << maleCorrect << std::endl;
+		std::cout << "female correct: " << femaleCorrect << std::endl;
+
+		std::string outfname("bayes_results_0");
+		outfname = outfname + std::to_string(i);
+		outfname = outfname + ".txt";
+		std::ofstream f(outfname);
+
+		if (f.is_open())
+		{
+			f << "male accuracy: " << (float)maleCorrect / (float)maleFaces.size() << std::endl;
+			f << "female accuracy: " << (float)femaleCorrect / (float)femaleFaces.size() << std::endl;
+			f << "total accuracy: " << (float)(maleCorrect + femaleCorrect) / (float)(maleFaces.size() + femaleFaces.size()) << std::endl;
+			f.close();
 		}
 	}
-
-	this->SaveMissclassifications("p2a_misses.csv");
-	this->misses1.clear();
-	this->misses2.clear();
-
-	//Here we do P(w1)=0.2 and P(w2)=0.8 -----------------------------------------------------------
-	for (int i = 0; i < pointCount; i++)
-	{
-		float d1 = CalculateDiscriminant(this->data1->data[i], m1, sig1, 0.2);
-		float d2 = CalculateDiscriminant(this->data1->data[i], m2, sig2, 0.8);
-
-		if (d1 < d2)
-		{
-			//We consider this data point a part of the data2 set, and it is therefore misclassified
-			this->misses1.push_back(this->data1->data[i]);
-		}
-
-		d1 = CalculateDiscriminant(this->data2->data[i], m1, sig1, 0.2);
-		d2 = CalculateDiscriminant(this->data2->data[i], m2, sig2, 0.8);
-
-		if (d1 > d2)
-		{
-			//We consider this data point a part of the data1 set, and it is therefore misclassified
-			this->misses2.push_back(this->data2->data[i]);
-		}
-	}
-
-	this->SaveMissclassifications("p2b_misses.csv");
-	this->misses1.clear();
-	this->misses2.clear();
-
-	//Save the test data
-	this->data1->SaveDataToFile("data2_1.csv");
-	this->data2->SaveDataToFile("data2_2.csv");
-
-	//Save the bounds
-	this->SaveErrorBounds("errorBounds2.csv", m1, sig1, m2, sig2);
 }
 
 DataGenerator* BayesClassifierCase3::GetDataGenerator1()

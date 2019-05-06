@@ -1,0 +1,3 @@
+male accuracy: 0.478261
+female accuracy: 0.569231
+total accuracy: 0.522388
